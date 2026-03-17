@@ -1,0 +1,254 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Syne:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* ============================================
+   DARK MODE — class-based (Tailwind v4)
+   CRITIQUE : sans ça, dark: utilise prefers-color-scheme
+   ============================================ */
+@variant dark (&:where(.dark, .dark *));
+
+/* ============================================
+   THEME TOKENS
+   ============================================ */
+@theme {
+  --color-nemo-orange: #fd6904;
+  --color-nemo-blue: #2596be;
+  --color-nemo-bg: #fcefdd;
+  --color-nemo-quote: #a32b0d;
+
+  /* Dark mode surfaces */
+  --color-nemo-dark-bg: #0d1b2a;
+  --color-nemo-dark-surface: #132338;
+  --color-nemo-dark-border: #253d58;
+
+  /* Dark text — contrastes WCAG AA garantis */
+  --color-nemo-dark-text: #f0e4d0;
+  --color-nemo-dark-muted: #9ab0c4;
+
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+  --font-syne: 'Syne', sans-serif;
+}
+
+/* ============================================
+   BASE
+   ============================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #fcefdd;
+  color: #0d1b2a;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.dark body {
+  background-color: #0d1b2a;
+  color: #f0e4d0;
+}
+
+h1, h2, h3, h4, h5, h6 { font-family: 'Syne', sans-serif; }
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #fcefdd; }
+.dark ::-webkit-scrollbar-track { background: #0d1b2a; }
+::-webkit-scrollbar-thumb { background: #fd6904; border-radius: 3px; }
+
+/* ============================================
+   CONTAINER
+   ============================================ */
+.container-nemo {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+@media (min-width: 640px)  { .container-nemo { padding: 0 2rem; } }
+@media (min-width: 1024px) { .container-nemo { padding: 0 3rem; } }
+@media (min-width: 1280px) { .container-nemo { padding: 0 4rem; } }
+
+/* ============================================
+   BOUTONS
+   ============================================ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  background-color: #fd6904;
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 25px;
+  border: 2px solid #fd6904;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  background-color: transparent;
+  color: #fd6904;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  background-color: transparent;
+  color: #2596be;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 25px;
+  border: 2px solid #2596be;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-secondary:hover {
+  background-color: #2596be;
+  color: #ffffff;
+}
+
+/* ============================================
+   SECTION
+   ============================================ */
+.section-py { padding-top: 5rem; padding-bottom: 5rem; }
+@media (min-width: 768px) { .section-py { padding-top: 7rem; padding-bottom: 7rem; } }
+
+/* ============================================
+   CARTES
+   ============================================ */
+.card-nemo {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(13, 27, 42, 0.08);
+  border-radius: 1.25rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.dark .card-nemo {
+  background: #132338;
+  border-color: #253d58;
+}
+.card-nemo:hover {
+  box-shadow: 0 8px 32px rgba(13, 27, 42, 0.08);
+  transform: translateY(-3px);
+}
+.dark .card-nemo:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   MARQUEE
+   ============================================ */
+.marquee-wrapper { overflow: hidden; white-space: nowrap; }
+.marquee-inner {
+  display: inline-flex;
+  animation: marquee-scroll 28s linear infinite;
+}
+.marquee-inner:hover { animation-play-state: paused; }
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ============================================
+   ACCESSIBILITÉ
+   ============================================ */
+*:focus-visible {
+  outline: 3px solid #fd6904;
+  outline-offset: 2px;
+}
+::selection { background-color: #fd6904; color: #fff; }
+
+/* ============================================
+   VANILLA COOKIE CONSENT — thème Nemo Solutions
+   ============================================ */
+
+/* Palette principale */
+#cc-main {
+  --cc-font-family: 'Plus Jakarta Sans', sans-serif;
+
+  /* Fond des modales */
+  --cc-bg: #fcefdd;
+  --cc-secondary-color: rgba(13, 27, 42, 0.6);
+  --cc-primary-color: #0d1b2a;
+
+  /* Bouton primaire = orange */
+  --cc-btn-primary-bg: #fd6904;
+  --cc-btn-primary-color: #ffffff;
+  --cc-btn-primary-border-color: #fd6904;
+  --cc-btn-primary-hover-bg: #e55a00;
+  --cc-btn-primary-hover-color: #ffffff;
+  --cc-btn-primary-hover-border-color: #e55a00;
+
+  /* Bouton secondaire = contour bleu */
+  --cc-btn-secondary-bg: transparent;
+  --cc-btn-secondary-color: #2596be;
+  --cc-btn-secondary-border-color: #2596be;
+  --cc-btn-secondary-hover-bg: #2596be;
+  --cc-btn-secondary-hover-color: #ffffff;
+  --cc-btn-secondary-hover-border-color: #2596be;
+
+  /* Toggle activé = orange */
+  --cc-toggle-on-bg: #fd6904;
+  --cc-toggle-off-bg: rgba(13, 27, 42, 0.2);
+  --cc-toggle-readonly-bg: rgba(37, 150, 190, 0.3);
+  --cc-toggle-knob-bg: #ffffff;
+  --cc-toggle-knob-icon-color: #fd6904;
+
+  /* Overlay */
+  --cc-overlay-bg: rgba(13, 27, 42, 0.55);
+
+  /* Badge "Toujours actifs" */
+  --cc-badge-bg: rgba(37, 150, 190, 0.12);
+  --cc-badge-color: #2596be;
+  --cc-badge-border-color: rgba(37, 150, 190, 0.3);
+
+  /* Liens */
+  --cc-link-color: #fd6904;
+
+  /* Séparateurs */
+  --cc-separator-bg: rgba(13, 27, 42, 0.08);
+
+  /* Coins arrondis */
+  --cc-modal-border-radius: 1.25rem;
+  --cc-btn-border-radius: 25px;
+
+  /* Z-index */
+  --cc-z-index: 9999;
+}
+
+/* Dark mode */
+.dark #cc-main {
+  --cc-bg: #132338;
+  --cc-primary-color: #f0e4d0;
+  --cc-secondary-color: #9ab0c4;
+  --cc-separator-bg: rgba(255, 255, 255, 0.06);
+  --cc-toggle-off-bg: rgba(240, 228, 208, 0.15);
+  --cc-overlay-bg: rgba(0, 0, 0, 0.65);
+}
+
+/* Barre consent en bas = style Nemo */
+#cc-main .cm {
+  border-top: 2px solid #fd6904;
+  box-shadow: 0 -4px 24px rgba(13, 27, 42, 0.08);
+}
+
+.dark #cc-main .cm {
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+}
