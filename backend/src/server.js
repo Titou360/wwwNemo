@@ -47,11 +47,12 @@ async function start() {
     const Admin = require('./models/Admin');
     const count = await Admin.countDocuments();
     if (count === 0) {
-      await Admin.create({
-        email: process.env.ADMIN_EMAIL,
-        password: process.env.ADMIN_PASSWORD,
-        name: 'Clément FELICES',
-      });
+const admin = new Admin({
+  email: process.env.ADMIN_EMAIL,
+  password: process.env.ADMIN_PASSWORD,
+  name: 'Clément FELICES',
+});
+await admin.save();
       console.log('✅ Admin créé :', process.env.ADMIN_EMAIL);
     }
 
