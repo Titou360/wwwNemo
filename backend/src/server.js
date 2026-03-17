@@ -2,18 +2,33 @@ require("dotenv").config();
 console.log('🔑 ADMIN_EMAIL:', process.env.ADMIN_EMAIL);
 console.log('🔑 ADMIN_PASSWORD length:', process.env.ADMIN_PASSWORD?.length);
 
-const count = await Admin.countDocuments();
-console.log('📊 Nombre d\'admins en base:', count);
-if (count === 0) {
-  const admin = new Admin({
-    email: process.env.ADMIN_EMAIL,
-    password: process.env.ADMIN_PASSWORD,
-    name: 'Clément FELICES',
-  });
-  await admin.save();
-  console.log('✅ Admin créé :', process.env.ADMIN_EMAIL);
-} else {
-  console.log('ℹ️ Admin déjà existant, pas de recréation');
+async function start() {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('✅ MongoDB connecté');
+
+    const Admin = require('./models/Admin');
+    const count = await Admin.countDocuments();
+    console.log('📊 Nombre d\'admins en base:', count);
+    
+    if (count === 0) {
+      const admin = new Admin({
+        email: process.env.ADMIN_EMAIL,
+        password: process.env.ADMIN_PASSWORD,
+        name: 'Clément FELICES',
+      });
+      await admin.save();
+      console.log('✅ Admin créé :', process.env.ADMIN_EMAIL);
+    } else {
+      console.log('ℹ️ Admin déjà existant');
+    }
+
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`));
+  } catch (err) {
+    console.error('❌ Erreur démarrage :', err.message);
+    process.exit(1);
+  }
 }
 
 
