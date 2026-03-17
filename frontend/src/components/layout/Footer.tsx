@@ -45,21 +45,19 @@ export default function Footer() {
   return (
     <footer role="contentinfo" className="bg-nemo-dark-bg text-nemo-bg/80">
       {/* Main footer */}
-      <div className="container-nemo py-16">
+      <div className="py-20 lg:py-28">
+      <div className="container-nemo">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
 
           {/* Brand column */}
           <div className="lg:col-span-1">
             <Link to="/" aria-label="Nemo Solutions - Retour accueil" className="inline-block mb-5">
               <img
-                src="/images/NemoSolutions.png"
+                src="/images/NemoSolutions.webp"
                 alt="Nemo Solutions"
-                className="h-10 w-auto brightness-0 invert"
-                onError={e => { e.currentTarget.style.display = 'none'; }}
+                className="h-30 w-auto"
+                onError={e => { e.currentTarget.src = '/images/NemoSolutions.png'; }}
               />
-              <span className="font-syne font-bold text-xl text-white" aria-hidden="true" style={{ display: 'none' }}>
-                Nemo Solutions
-              </span>
             </Link>
             <p className="font-jakarta text-sm leading-relaxed text-nemo-bg/60 mb-6">
               Votre partenaire digital en Val de l'Eyre et Nouvelle-Aquitaine.
@@ -173,18 +171,21 @@ export default function Footer() {
           </div>
         </div>
       </div>
+      </div>
 
       {/* Bottom bar */}
       <div className="border-t border-white/5">
-        <div className="container-nemo py-5">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs font-jakarta text-nemo-bg/40">
-            <p>
-              © {currentYear} Nemo Solutions — Entreprise Individuelle Clément FELICES.
-              Tous droits réservés.
-            </p>
-            <p className="flex items-center gap-1">
-              Fait avec <Heart size={12} className="text-nemo-orange fill-nemo-orange" aria-label="amour" /> en Val de l'Eyre
-            </p>
+        <div className="py-7">
+          <div className="container-nemo">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs font-jakarta text-nemo-bg/40">
+              <p>
+                © {currentYear} Nemo Solutions — Entreprise Individuelle Clément FELICES.
+                Tous droits réservés.
+              </p>
+              <p className="flex items-center gap-1">
+                Fait avec <Heart size={12} className="text-nemo-orange fill-nemo-orange" aria-label="amour" /> en Val de l'Eyre
+              </p>
+            </div>
           </div>
         </div>
       </div>

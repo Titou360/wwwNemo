@@ -143,7 +143,7 @@ export default function Hero() {
               initial={{ opacity: 0, scale: 0.88 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.75, delay: 0.25 }}
-              className="relative flex items-center justify-center w-64 h-64 sm:w-80 sm:h-80 lg:w-104 lg:h-104 rounded-full bg-nemo-dark-bg/5 dark:bg-nemo-bg/5"
+              className="relative flex items-center justify-center w-64 h-64 sm:w-80 sm:h-80 lg:w-104 lg:h-104"
             >
               <img
                 src="/images/NemoSolutions.webp"

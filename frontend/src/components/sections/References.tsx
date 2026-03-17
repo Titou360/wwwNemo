@@ -24,16 +24,6 @@ const LINK_ICONS: Record<string, React.ElementType> = {
   other: ExternalLink,
 };
 
-// Placeholder data shown when API is not yet available
-const PLACEHOLDER_CLIENTS: Client[] = [
-  { _id: '1', name: 'Client Référence', links: [{ type: 'website', url: '#' }] },
-  { _id: '2', name: 'Client Référence', links: [{ type: 'facebook', url: '#' }, { type: 'instagram', url: '#' }] },
-  { _id: '3', name: 'Client Référence', links: [{ type: 'website', url: '#' }] },
-  { _id: '4', name: 'Client Référence', links: [{ type: 'linkedin', url: '#' }] },
-  { _id: '5', name: 'Client Référence', links: [{ type: 'website', url: '#' }, { type: 'facebook', url: '#' }] },
-  { _id: '6', name: 'Client Référence', links: [{ type: 'instagram', url: '#' }] },
-];
-
 export default function References() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,12 +31,12 @@ export default function References() {
   useEffect(() => {
     fetch('/api/clients')
       .then(r => r.json())
-      .then(data => {
-        setClients(Array.isArray(data) && data.length > 0 ? data : PLACEHOLDER_CLIENTS);
-      })
-      .catch(() => setClients(PLACEHOLDER_CLIENTS))
+      .then(data => setClients(Array.isArray(data) ? data : []))
+      .catch(() => setClients([]))
       .finally(() => setLoading(false));
   }, []);
+
+  if (!loading && clients.length === 0) return null;
 
   return (
     <section

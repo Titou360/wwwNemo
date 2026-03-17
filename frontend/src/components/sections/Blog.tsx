@@ -15,42 +15,6 @@ interface Article {
   publishedAt?: string;
 }
 
-const PLACEHOLDER_ARTICLES: Article[] = [
-  {
-    _id: '1',
-    title: 'Pourquoi un site internet est indispensable en 2025',
-    subtitle: 'Visibilité, crédibilité et croissance',
-    slug: 'site-internet-2025',
-    excerpt: 'Dans un monde où 90% des parcours d\'achat commencent en ligne, ne pas avoir de site web, c\'est se priver d\'une vitrine permanente ouverte 24h/24.',
-    content: '<p>Dans un monde où 90% des parcours d\'achat commencent en ligne, ne pas avoir de site web, c\'est se priver d\'une vitrine permanente ouverte 24h/24.</p><p>Que vous soyez artisan, commerçant ou prestataire de service, votre présence digitale est votre premier commercial.</p>',
-    image: '',
-    tag: 'Conseil',
-    publishedAt: '2025-03-01T10:00:00.000Z',
-  },
-  {
-    _id: '2',
-    title: 'SEO local : dominez Google dans votre zone',
-    subtitle: 'Être visible là où sont vos clients',
-    slug: 'seo-local-google',
-    excerpt: 'Le référencement local est l\'arme secrète des TPE et PME. Découvrez comment apparaître en tête des résultats dans votre ville et attirer des clients de proximité.',
-    content: '<p>Le référencement local est l\'arme secrète des TPE et PME.</p><p>Fiche Google Business Profile, citations locales, avis clients : voici les leviers pour dominer votre zone géographique.</p>',
-    image: '',
-    tag: 'SEO',
-    publishedAt: '2025-02-15T10:00:00.000Z',
-  },
-  {
-    _id: '3',
-    title: 'Intelligence artificielle : vos outils du quotidien',
-    subtitle: 'ChatGPT, Midjourney et autres assistants IA',
-    slug: 'intelligence-artificielle-outils',
-    excerpt: 'L\'IA n\'est plus réservée aux grandes entreprises. Découvrez comment les outils d\'intelligence artificielle peuvent transformer votre productivité au quotidien.',
-    content: '<p>L\'IA n\'est plus réservée aux grandes entreprises.</p><p>ChatGPT pour la rédaction, Midjourney pour les visuels, Notion AI pour l\'organisation... Ces outils sont accessibles à tous.</p>',
-    image: '',
-    tag: 'IA',
-    publishedAt: '2025-01-20T10:00:00.000Z',
-  },
-];
-
 function formatDate(iso?: string) {
   if (!iso) return '';
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -213,10 +177,12 @@ export default function Blog() {
   useEffect(() => {
     fetch('/api/articles')
       .then(r => r.json())
-      .then(data => setArticles(Array.isArray(data) && data.length > 0 ? data : PLACEHOLDER_ARTICLES))
-      .catch(() => setArticles(PLACEHOLDER_ARTICLES))
+      .then(data => setArticles(Array.isArray(data) ? data : []))
+      .catch(() => setArticles([]))
       .finally(() => setLoading(false));
   }, []);
+
+  if (!loading && articles.length === 0) return null;
 
   const total = articles.length;
   const canPrev = current > 0;

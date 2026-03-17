@@ -38,7 +38,7 @@ export default function About() {
               <img
                 src="/images/clement-felices.png"
                 alt="Clément FELICES - Fondateur de Nemo Solutions"
-                className="relative w-32 h-32 rounded-full object-cover border-4 border-white dark:border-nemo-dark-surface shadow-xl"
+                className="relative w-32 h-32 rounded-full object-cover object-[center_5%] border-4 border-white dark:border-nemo-dark-surface shadow-xl"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   const parent = e.currentTarget.parentElement;

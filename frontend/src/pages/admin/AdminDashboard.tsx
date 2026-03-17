@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, FileText, Users, Star, LogOut, Plus, Pencil, Trash2,
-  Eye, EyeOff, AlertTriangle, X, Check
+  Eye, EyeOff, AlertTriangle, X, Check, ExternalLink
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -313,9 +313,19 @@ export default function AdminDashboard() {
           ))}
         </ul>
 
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-nemo-bg/60 hover:bg-white/5 hover:text-nemo-bg font-jakarta text-sm transition-all mt-2"
+        >
+          <ExternalLink size={16} aria-hidden="true" />
+          Voir le site
+        </a>
+
         <button
           onClick={logout}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-red-400 hover:bg-red-500/10 font-jakarta text-sm transition-all mt-4"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-red-400 hover:bg-red-500/10 font-jakarta text-sm transition-all mt-1"
           aria-label="Se déconnecter"
         >
           <LogOut size={16} aria-hidden="true" />

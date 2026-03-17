@@ -12,41 +12,6 @@ interface Testimonial {
   text: string;
 }
 
-const PLACEHOLDER: Testimonial[] = [
-  {
-    _id: '1',
-    author: 'Marie D.',
-    company: 'Fleuriste du Bassin',
-    role: 'Gérante',
-    rating: 5,
-    text: 'Clément a créé notre site en un temps record. Le résultat est magnifique et nos clients adorent la facilité d\'utilisation. Notre chiffre d\'affaires en ligne a augmenté de 40% !',
-  },
-  {
-    _id: '2',
-    author: 'Pierre M.',
-    company: 'Menuiserie Bordelaise',
-    role: 'Artisan',
-    rating: 5,
-    text: 'Enfin un prestataire qui comprend les besoins des artisans. Disponible, réactif et professionnel. Je recommande vivement Nemo Solutions à tous mes confrères.',
-  },
-  {
-    _id: '3',
-    author: 'Sophie L.',
-    company: 'Cabinet Médical',
-    role: 'Praticienne',
-    rating: 5,
-    text: 'La refonte de notre site et le travail SEO ont doublé nos prises de rendez-vous en ligne. Un accompagnement au top, avec des explications claires à chaque étape.',
-  },
-  {
-    _id: '4',
-    author: 'Thomas R.',
-    company: 'Restaurant Les Landes',
-    role: 'Restaurateur',
-    rating: 5,
-    text: 'Site vitrine + gestion des réseaux sociaux, Nemo Solutions gère tout. On peut enfin se concentrer sur notre cuisine pendant qu\'eux gèrent notre visibilité digitale.',
-  },
-];
-
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-0.5" role="img" aria-label={`Note : ${rating} étoiles sur 5`}>
@@ -69,10 +34,12 @@ export default function Testimonials() {
   useEffect(() => {
     fetch('/api/testimonials')
       .then(r => r.json())
-      .then(data => setTestimonials(Array.isArray(data) && data.length > 0 ? data : PLACEHOLDER))
-      .catch(() => setTestimonials(PLACEHOLDER))
+      .then(data => setTestimonials(Array.isArray(data) ? data : []))
+      .catch(() => setTestimonials([]))
       .finally(() => setLoading(false));
   }, []);
+
+  if (!loading && testimonials.length === 0) return null;
 
   return (
     <section
