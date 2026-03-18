@@ -10,6 +10,7 @@ const clientSchema = new mongoose.Schema({
   logo: { type: String }, // image path/url
   logoAlt: { type: String, default: '' },
   links: [linkSchema],
+  description: { type: String, default: '' }, // HTML depuis TipTap
   featured: { type: Boolean, default: true },
   order: { type: Number, default: 0 },
 }, { timestamps: true });

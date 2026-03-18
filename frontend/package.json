@@ -11,6 +11,10 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
+    "@tiptap/extension-link": "^3.20.4",
+    "@tiptap/extension-underline": "^3.20.4",
+    "@tiptap/react": "^3.20.4",
+    "@tiptap/starter-kit": "^3.20.4",
     "framer-motion": "^12.37.0",
     "gsap": "^3.14.2",
     "lucide-react": "^0.577.0",
