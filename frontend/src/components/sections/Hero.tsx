@@ -137,7 +137,7 @@ export default function Hero() {
           </div>
 
           {/* Visuel logo */}
-          <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
+          <div className="order-1 lg:order-2 flex justify-center lg:justify-end mt-14 sm:mt-0">
             <motion.div
               ref={logoRef}
               initial={{ opacity: 0, scale: 0.88 }}

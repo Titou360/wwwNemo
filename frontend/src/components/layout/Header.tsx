@@ -149,13 +149,13 @@ export default function Header() {
               <div className="absolute bottom-0 left-0 w-80 h-80 bg-nemo-blue/5 rounded-full blur-3xl" />
             </div>
 
-            <div className="relative flex flex-col h-full min-h-screen p-8 md:p-16">
+            <div className="relative flex flex-col h-full min-h-screen p-6 md:p-16">
               {/* Top spacer */}
-              <div className="h-20" />
+              <div className="h-16" />
 
               {/* Navigation links */}
               <nav className="flex-1 flex flex-col justify-center" aria-label="Navigation principale">
-                <ul className="list-none p-0 m-0 space-y-2">
+                <ul className="list-none p-0 m-0 space-y-0">
                   {NAV_LINKS.map((link, i) => (
                     <motion.li
                       key={link.href}
@@ -167,9 +167,9 @@ export default function Header() {
                       <Link
                         to={link.href}
                         onClick={() => setMenuOpen(false)}
-                        className="group flex items-center gap-4 text-4xl md:text-6xl font-syne font-bold text-white/80 hover:text-nemo-orange transition-colors duration-300 py-2"
+                        className="group flex items-center gap-3 text-2xl sm:text-4xl md:text-6xl font-syne font-bold text-white/80 hover:text-nemo-orange transition-colors duration-300 py-1.5 sm:py-2"
                       >
-                        <span className="text-sm font-jakarta text-nemo-orange/60 w-8">
+                        <span className="text-xs sm:text-sm font-jakarta text-nemo-orange/60 w-6 sm:w-8">
                           0{i + 1}
                         </span>
                         <span className="relative">
