@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Phone, Video } from 'lucide-react';
+import Breadcrumb from '../components/ui/Breadcrumb';
 
 export default function PrendreRdv() {
   return (
@@ -13,6 +14,7 @@ export default function PrendreRdv() {
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
         <div className="container-nemo max-w-4xl">
+          <Breadcrumb crumbs={[{ label: 'Prendre RDV' }]} />
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -40,7 +42,7 @@ export default function PrendreRdv() {
               { icon: Calendar, label: 'Présentiel', desc: 'Belin-Béliet (sur RDV)' },
             ].map(({ icon: Icon, label, desc }) => (
               <div key={label} className="card-nemo p-5 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-nemo-orange/10 text-nemo-orange flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                <div className="w-10 h-10 rounded-xl bg-nemo-orange/10 text-nemo-orange flex items-center justify-center shrink-0" aria-hidden="true">
                   <Icon size={18} />
                 </div>
                 <div>
@@ -60,7 +62,7 @@ export default function PrendreRdv() {
           >
             {/* TODO: Replace with your actual Calendly / Cal.com / iCal widget URL */}
             {/* Example: <iframe src="https://calendly.com/votre-lien" ... /> */}
-            <div className="bg-gradient-to-br from-nemo-orange/5 to-nemo-blue/5 p-12 text-center">
+            <div className="bg-linear-to-br from-nemo-orange/5 to-nemo-blue/5 p-12 text-center">
               <div className="w-16 h-16 rounded-2xl bg-nemo-orange/10 flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                 <Calendar size={28} className="text-nemo-orange" />
               </div>
@@ -94,7 +96,7 @@ export default function PrendreRdv() {
               {/* Instructions for integration */}
               <div className="mt-8 p-4 rounded-xl bg-nemo-blue/5 border border-nemo-blue/10 text-left max-w-lg mx-auto">
                 <div className="flex items-start gap-2">
-                  <Clock size={14} className="text-nemo-blue mt-0.5 flex-shrink-0" aria-hidden="true" />
+                  <Clock size={14} className="text-nemo-blue mt-0.5 shrink-0" aria-hidden="true" />
                   <p className="font-jakarta text-xs text-nemo-dark-bg/60 dark:text-nemo-bg/60">
                     <strong className="text-nemo-blue">Pour intégrer votre planning :</strong>{' '}
                     Remplacez ce bloc par votre iframe Calendly :{' '}

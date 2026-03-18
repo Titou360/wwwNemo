@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
+import Breadcrumb from '../components/ui/Breadcrumb';
 
 export default function MentionsLegales() {
   return (
@@ -12,6 +13,7 @@ export default function MentionsLegales() {
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
         <div className="container-nemo max-w-3xl">
+          <Breadcrumb crumbs={[{ label: 'Mentions légales' }]} />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

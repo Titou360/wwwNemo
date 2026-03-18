@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Breadcrumb from '../components/ui/Breadcrumb';
 
 const FAQ_ITEMS = [
   {
@@ -84,7 +85,7 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.25 }}
-          className="flex-shrink-0 text-nemo-orange"
+          className="shrink-0 text-nemo-orange"
           aria-hidden="true"
         >
           <ChevronDown size={20} />
@@ -126,6 +127,7 @@ export default function FAQ() {
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
         <div className="container-nemo max-w-3xl">
+          <Breadcrumb crumbs={[{ label: 'FAQ' }]} />
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}

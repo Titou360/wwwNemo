@@ -3,6 +3,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import Header from './components/layout/Header';
+import Breadcrumb from './components/ui/Breadcrumb';
 import Footer from './components/layout/Footer';
 import CookieConsentInit from './components/ui/CookieConsent';
 import Home from './pages/Home';
@@ -40,14 +41,17 @@ function PageLocale() {
   return (
     <PublicLayout>
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
-        <div className="container-nemo max-w-3xl text-center">
-          <h1 className="font-syne font-extrabold text-4xl text-nemo-dark-bg dark:text-nemo-bg mb-6">
-            Agence web <span className="text-nemo-orange">{cityCapitalized}</span>
-          </h1>
-          <p className="font-jakarta text-nemo-dark-bg/60 dark:text-nemo-bg/60 text-lg leading-relaxed">
-            Nemo Solutions accompagne les entreprises de {cityCapitalized} dans leur développement digital.
-            Création de sites internet, SEO local, gestion des réseaux sociaux.
-          </p>
+        <div className="container-nemo max-w-3xl">
+          <Breadcrumb crumbs={[{ label: 'Pages locales', href: undefined }, { label: cityCapitalized }]} />
+          <div className="text-center">
+            <h1 className="font-syne font-extrabold text-4xl text-nemo-dark-bg dark:text-nemo-bg mb-6">
+              Agence web <span className="text-nemo-orange">{cityCapitalized}</span>
+            </h1>
+            <p className="font-jakarta text-nemo-dark-bg/60 dark:text-nemo-bg/60 text-lg leading-relaxed">
+              Nemo Solutions accompagne les entreprises de {cityCapitalized} dans leur développement digital.
+              Création de sites internet, SEO local, gestion des réseaux sociaux.
+            </p>
+          </div>
         </div>
       </main>
     </PublicLayout>

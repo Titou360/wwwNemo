@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Send, Phone, Mail, MapPin, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import Breadcrumb from '../components/ui/Breadcrumb';
 
 const SUBJECTS = [
   'Création de site internet',
@@ -42,6 +43,7 @@ export default function Contact() {
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
         <div className="container-nemo">
+          <Breadcrumb crumbs={[{ label: 'Contact' }]} />
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -76,7 +78,7 @@ export default function Contact() {
                 { icon: Clock, label: 'Disponibilité', value: 'Lun–Ven : 9h–19h\nUrgences sur rendez-vous', href: undefined, ariaLabel: undefined },
               ].map(({ icon: Icon, label, value, href, ariaLabel }) => (
                 <div key={label} className="card-nemo p-5 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-nemo-orange/10 flex items-center justify-center text-nemo-orange flex-shrink-0" aria-hidden="true">
+                  <div className="w-10 h-10 rounded-xl bg-nemo-orange/10 flex items-center justify-center text-nemo-orange shrink-0" aria-hidden="true">
                     <Icon size={18} />
                   </div>
                   <div>
