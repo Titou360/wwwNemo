@@ -1,18 +1,11 @@
 const router = require('express').Router();
 const multer = require('multer');
-const path = require('path');
+const { cloudinary, makeStorage } = require('../cloudinary');
 const Article = require('../models/Article');
 const auth = require('../middleware/auth');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'article-' + unique + path.extname(file.originalname));
-  },
-});
 const upload = multer({
-  storage,
+  storage: makeStorage('nemo/articles'),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) cb(null, true);
@@ -57,7 +50,7 @@ router.get('/:slug', async (req, res) => {
 router.post('/', auth, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.image = '/uploads/' + req.file.filename;
+    if (req.file) data.image = req.file.path; // Cloudinary URL
     const article = new Article(data);
     await article.save();
     res.status(201).json(article);
@@ -70,7 +63,7 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
 router.put('/:id', auth, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.image = '/uploads/' + req.file.filename;
+    if (req.file) data.image = req.file.path; // Cloudinary URL
     const article = await Article.findByIdAndUpdate(req.params.id, data, { new: true, runValidators: true });
     if (!article) return res.status(404).json({ message: 'Article introuvable' });
     res.json(article);
@@ -84,6 +77,11 @@ router.delete('/:id', auth, async (req, res) => {
   try {
     const article = await Article.findByIdAndDelete(req.params.id);
     if (!article) return res.status(404).json({ message: 'Article introuvable' });
+    // Delete image from Cloudinary if present
+    if (article.image && article.image.includes('cloudinary')) {
+      const publicId = article.image.split('/').slice(-2).join('/').replace(/\.[^/.]+$/, '');
+      await cloudinary.uploader.destroy(publicId).catch(() => {});
+    }
     res.json({ message: 'Article supprimé' });
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, FileText, Users, Star, LogOut, Plus, Pencil, Trash2,
   Eye, EyeOff, AlertTriangle, X, Check, ExternalLink, Globe, Facebook,
-  Instagram, Linkedin, Twitter,
+  Instagram, Linkedin, Twitter, Image, FileImage,
 } from 'lucide-react';
 import RichTextEditor from '../../components/ui/RichTextEditor';
 
@@ -56,13 +56,20 @@ interface Testimonial {
   order?: number;
 }
 
-type Section = 'articles' | 'clients' | 'testimonials';
+type Section = 'articles' | 'clients' | 'testimonials' | 'media';
 
-const CONFIRM_PHRASES: Record<Section, string> = {
+const CONFIRM_PHRASES: Record<'articles' | 'clients' | 'testimonials', string> = {
   articles:     "Je supprime l'article",
   clients:      'Je supprime le client',
   testimonials: "Je supprime l'avis",
 };
+
+interface MediaFile {
+  filename: string;
+  url: string;
+  size: number;
+  createdAt: string;
+}
 
 const LINK_TYPE_LABELS: Record<LinkType, string> = {
   website:   'Site web',
@@ -539,6 +546,151 @@ function TestimonialForm({
   );
 }
 
+// ── Media Library ──────────────────────────────────────────────────────────────
+
+function MediaLibrary({ token }: { token: string }) {
+  const [files, setFiles] = useState<MediaFile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<MediaFile | null>(null);
+  const [typed, setTyped] = useState('');
+  const PHRASE = 'Je supprime cette image';
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetch('/api/media', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json());
+      setFiles(Array.isArray(data) ? data : []);
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const handleDelete = async () => {
+    if (!deleteTarget || typed !== PHRASE) return;
+    await fetch(`/api/media/${encodeURIComponent(deleteTarget.filename)}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setDeleteTarget(null);
+    setTyped('');
+    load();
+  };
+
+  const formatSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} o`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} Ko`;
+    return `${(bytes / 1024 / 1024).toFixed(1)} Mo`;
+  };
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-6">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div key={i} className="aspect-square rounded-xl bg-nemo-dark-bg animate-pulse" aria-hidden="true" />
+        ))}
+      </div>
+    );
+  }
+
+  if (files.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-4 text-nemo-bg/30">
+        <FileImage size={48} aria-hidden="true" />
+        <p className="font-jakarta text-sm">Aucune image uploadée pour le moment.</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="p-6">
+        <p className="font-jakarta text-xs text-nemo-bg/40 mb-5">{files.length} fichier{files.length > 1 ? 's' : ''}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {files.map(file => (
+            <div key={file.filename} className="group relative aspect-square rounded-xl overflow-hidden bg-nemo-dark-bg border border-nemo-dark-border">
+              <img
+                src={file.url}
+                alt={file.filename}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+              {/* Overlay on hover */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-200 flex flex-col justify-between p-2">
+                {/* Delete button */}
+                <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <button
+                    onClick={() => { setDeleteTarget(file); setTyped(''); }}
+                    title="Supprimer"
+                    className="w-8 h-8 rounded-lg bg-red-600 text-white flex items-center justify-center shadow-lg hover:bg-red-700 transition-colors"
+                    aria-label={`Supprimer ${file.filename}`}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+                {/* File info */}
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <p className="font-jakarta text-white text-xs font-semibold truncate leading-tight">{file.filename}</p>
+                  <p className="font-jakarta text-white/60 text-xs">{formatSize(file.size)}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Delete Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-nemo-dark-surface border border-red-500/30 rounded-2xl p-8 max-w-md w-full shadow-2xl"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <AlertTriangle size={24} className="text-red-400 shrink-0" aria-hidden="true" />
+              <h2 className="font-syne font-bold text-lg text-white">Supprimer l'image</h2>
+            </div>
+            <div className="mb-4 rounded-xl overflow-hidden bg-nemo-dark-bg border border-nemo-dark-border">
+              <img src={deleteTarget.url} alt={deleteTarget.filename} className="w-full max-h-40 object-contain" />
+            </div>
+            <p className="font-jakarta text-nemo-bg/70 text-sm mb-2">
+              Fichier : <strong className="text-white">{deleteTarget.filename}</strong>
+            </p>
+            <p className="font-jakarta text-nemo-bg/70 text-sm mb-5">
+              Pour confirmer, tapez <strong className="text-red-400">"{PHRASE}"</strong> :
+            </p>
+            <input
+              type="text"
+              value={typed}
+              onChange={e => setTyped(e.target.value)}
+              placeholder={PHRASE}
+              className="w-full px-4 py-2.5 rounded-xl bg-nemo-dark-bg border border-nemo-dark-border text-white font-jakarta text-sm mb-5 focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-400/20 transition-all"
+            />
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => { setDeleteTarget(null); setTyped(''); }}
+                className="btn-secondary text-sm px-5 py-2"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={typed !== PHRASE}
+                className="inline-flex items-center gap-2 px-5 py-2 bg-red-600 text-white font-jakarta font-semibold text-sm rounded-[25px] hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                <Trash2 size={14} aria-hidden="true" />
+                Supprimer
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </>
+  );
+}
+
 // ── Main Dashboard ─────────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
@@ -550,7 +702,7 @@ export default function AdminDashboard() {
   const [clients, setClients] = useState<Client[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string; type: Section } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string; type: 'articles' | 'clients' | 'testimonials' } | null>(null);
   const [editArticle, setEditArticle] = useState<Article | null | 'new'>(null);
   const [editClient, setEditClient] = useState<Client | null | 'new'>(null);
   const [editTestimonial, setEditTestimonial] = useState<Testimonial | null | 'new'>(null);
@@ -596,10 +748,11 @@ export default function AdminDashboard() {
 
   const logout = () => { localStorage.removeItem('nemo-admin-token'); navigate('/admin'); };
 
-  const NAV_ITEMS = [
-    { key: 'articles'     as Section, label: 'Articles', icon: FileText, count: articles.length },
-    { key: 'clients'      as Section, label: 'Clients',  icon: Users,    count: clients.length },
-    { key: 'testimonials' as Section, label: 'Avis',     icon: Star,     count: testimonials.length },
+  const NAV_ITEMS: { key: Section; label: string; icon: React.ElementType; count?: number }[] = [
+    { key: 'articles',     label: 'Articles',    icon: FileText, count: articles.length },
+    { key: 'clients',      label: 'Clients',     icon: Users,    count: clients.length },
+    { key: 'testimonials', label: 'Avis',        icon: Star,     count: testimonials.length },
+    { key: 'media',        label: 'Médiathèque', icon: Image },
   ];
 
   const tdCls = 'px-4 py-3 text-sm font-jakarta text-nemo-bg/80';
@@ -628,9 +781,11 @@ export default function AdminDashboard() {
                   <Icon size={16} aria-hidden="true" />
                   {label}
                 </span>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${section === key ? 'bg-white/20' : 'bg-nemo-dark-bg'}`}>
-                  {count}
-                </span>
+                {count !== undefined && (
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${section === key ? 'bg-white/20' : 'bg-nemo-dark-bg'}`}>
+                    {count}
+                  </span>
+                )}
               </button>
             </li>
           ))}
@@ -857,6 +1012,13 @@ export default function AdminDashboard() {
                   )}
                 </motion.div>
               )}
+              {/* ── MEDIA ── */}
+              {section === 'media' && (
+                <motion.div key="media" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <MediaLibrary token={token} />
+                </motion.div>
+              )}
+
             </AnimatePresence>
           </div>
         )}
