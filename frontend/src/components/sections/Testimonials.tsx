@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Quote, Star } from 'lucide-react';
+import { Quote, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 type SourceKey = 'google' | 'linkedin' | 'facebook' | 'instagram' | 'malt' | 'fiverr';
 
@@ -95,14 +95,10 @@ function SourceBadge({ source }: { source?: SourceKey | '' }) {
   if (!source) return null;
   const cfg = SOURCE_CONFIG[source];
   if (!cfg) return null;
-
   return (
     <div
       className="absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded-full shadow-sm text-xs font-jakarta font-semibold"
-      style={{
-        background: cfg.bg,
-        color: cfg.text,
-      }}
+      style={{ background: cfg.bg, color: cfg.text }}
       aria-label={`Avis ${cfg.label}`}
       title={`Avis ${cfg.label}`}
     >
@@ -112,29 +108,72 @@ function SourceBadge({ source }: { source?: SourceKey | '' }) {
   );
 }
 
-// ── Star Rating ───────────────────────────────────────────────────────────────
-
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-0.5" role="img" aria-label={`Note : ${rating} étoiles sur 5`}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          size={14}
-          className={i < rating ? 'text-nemo-orange fill-nemo-orange' : 'text-nemo-dark-bg/20 dark:text-nemo-bg/20'}
-          aria-hidden="true"
-        />
+        <Star key={i} size={14} className={i < rating ? 'text-nemo-orange fill-nemo-orange' : 'text-nemo-dark-bg/20 dark:text-nemo-bg/20'} aria-hidden="true" />
       ))}
     </div>
   );
 }
 
+// ── Card ──────────────────────────────────────────────────────────────────────
+
+function TestimonialCard({ t }: { t: Testimonial }) {
+  return (
+    <blockquote className="card-nemo p-6 relative flex flex-col h-full select-none">
+      <SourceBadge source={t.source} />
+      <Quote size={28} className="text-nemo-quote/20 mb-4" aria-hidden="true" />
+      <StarRating rating={t.rating} />
+      <p className="font-jakarta text-sm text-nemo-dark-bg/80 dark:text-nemo-dark-text/90 leading-relaxed mt-3 mb-4 italic flex-1">
+        "{t.text}"
+      </p>
+      <footer className="flex flex-col gap-3 pt-4 border-t border-nemo-dark-bg/8 dark:border-nemo-dark-border">
+        <div className="flex items-center gap-3">
+          {t.avatar ? (
+            <img src={t.avatar} alt={`Photo de ${t.author}`} className="w-9 h-9 rounded-full object-cover shrink-0" loading="lazy" />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-nemo-orange/15 dark:bg-nemo-orange/20 text-nemo-orange flex items-center justify-center font-jakarta font-bold text-sm shrink-0" aria-hidden="true">
+              {t.author.charAt(0)}
+            </div>
+          )}
+          <div>
+            <cite className="font-jakarta font-semibold text-sm text-nemo-dark-bg dark:text-nemo-dark-text not-italic">{t.author}</cite>
+            {(t.company || t.role) && (
+              <p className="font-jakarta text-xs text-nemo-dark-bg/50 dark:text-nemo-dark-muted">
+                {[t.role, t.company].filter(Boolean).join(' — ')}
+              </p>
+            )}
+          </div>
+        </div>
+        {formatReviewDate(t.reviewDate) && (
+          <p className="font-jakarta text-xs text-nemo-dark-bg/35 dark:text-nemo-dark-muted/60 text-right">
+            {formatReviewDate(t.reviewDate)}
+          </p>
+        )}
+      </footer>
+    </blockquote>
+  );
+}
+
 // ── Section ───────────────────────────────────────────────────────────────────
+
+const GAP = 24;
 
 export default function Testimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]           = useState(true);
+  const [current, setCurrent]           = useState(0);
+  const [visibleCount, setVisibleCount] = useState(3);
+  const [containerW, setContainerW]     = useState(0);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isPaused     = useRef(false);
+  const autoRef      = useRef<ReturnType<typeof setInterval> | null>(null);
+  const touchStartX  = useRef(0);
+
+  // Fetch
   useEffect(() => {
     fetch('/api/testimonials')
       .then(r => r.json())
@@ -143,7 +182,63 @@ export default function Testimonials() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (!loading && testimonials.length === 0) return null;
+  // Responsive: 1 on mobile, 3 on sm+
+  useEffect(() => {
+    const update = () => setVisibleCount(window.innerWidth < 640 ? 1 : 3);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  // Container width (for pixel-perfect card sizing)
+  useLayoutEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    setContainerW(el.getBoundingClientRect().width);
+    const ro = new ResizeObserver(entries => setContainerW(entries[0].contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [loading, testimonials.length]); // re-déclenche quand le div apparaît après le fetch
+
+  const total    = testimonials.length;
+  const maxIndex = Math.max(0, total - visibleCount);
+  const useSlider = total > 1 && (visibleCount === 1 ? total > 1 : total > visibleCount);
+
+  const goTo = useCallback((i: number) => setCurrent(Math.max(0, Math.min(i, maxIndex))), [maxIndex]);
+  const next = useCallback(() => setCurrent(p => p >= maxIndex ? 0 : p + 1), [maxIndex]);
+  const prev = useCallback(() => setCurrent(p => p <= 0 ? maxIndex : p - 1), [maxIndex]);
+
+  // Clamp on resize
+  useEffect(() => { setCurrent(p => Math.min(p, maxIndex)); }, [maxIndex]);
+
+  // Auto-play
+  const startAuto = useCallback(() => {
+    if (autoRef.current) clearInterval(autoRef.current);
+    if (!useSlider) return;
+    autoRef.current = setInterval(() => {
+      if (!isPaused.current) setCurrent(p => p >= maxIndex ? 0 : p + 1);
+    }, 4500);
+  }, [useSlider, maxIndex]);
+
+  useEffect(() => {
+    startAuto();
+    return () => { if (autoRef.current) clearInterval(autoRef.current); };
+  }, [startAuto]);
+
+  // Touch swipe
+  const onTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
+  const onTouchEnd   = (e: React.TouchEvent) => {
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 48) diff > 0 ? next() : prev();
+  };
+
+  if (!loading && total === 0) return null;
+
+  // Slider geometry
+  const cardW      = containerW > 0 ? Math.floor((containerW - GAP * (visibleCount - 1)) / visibleCount) : 0;
+  const slideBy    = cardW + GAP;
+  const translateX = -(current * slideBy);
+  const dotsCount  = maxIndex + 1;
 
   return (
     <section
@@ -152,7 +247,14 @@ export default function Testimonials() {
       className="section-py bg-white/60 dark:bg-nemo-dark-surface relative"
     >
       <div className="container-nemo">
-        <div className="text-center mb-14">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-14"
+        >
           <span className="inline-block px-4 py-1.5 rounded-full bg-nemo-quote/10 text-nemo-quote text-sm font-jakarta font-semibold mb-4 border border-nemo-quote/25">
             Avis clients
           </span>
@@ -166,71 +268,100 @@ export default function Testimonials() {
           <p className="font-jakarta text-nemo-dark-bg/60 dark:text-nemo-dark-muted text-lg max-w-xl mx-auto">
             La satisfaction de nos clients est notre meilleure carte de visite.
           </p>
-        </div>
+        </motion.div>
 
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {Array.from({ length: 4 }).map((_, i) => (
+        {/* Skeleton */}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="card-nemo h-56 animate-pulse" aria-hidden="true" />
             ))}
           </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {testimonials.map((t, i) => (
-              <motion.blockquote
-                key={t._id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ delay: i * 0.1, duration: 0.6 }}
-                className="card-nemo p-6 relative flex flex-col"
+        )}
+
+        {/* Slider */}
+        {!loading && total > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.65, delay: 0.15 }}
+            onMouseEnter={() => { isPaused.current = true; }}
+            onMouseLeave={() => { isPaused.current = false; }}
+          >
+            {/* Track */}
+            <div
+              ref={containerRef}
+              className="overflow-hidden"
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  gap: `${GAP}px`,
+                  transform: `translateX(${translateX}px)`,
+                  transition: 'transform 0.52s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  willChange: 'transform',
+                }}
               >
-                {/* Badge source */}
-                <SourceBadge source={t.source} />
-
-                {/* Quote icon */}
-                <Quote size={28} className="text-nemo-quote/20 mb-4" aria-hidden="true" />
-
-                {/* Stars */}
-                <StarRating rating={t.rating} />
-
-                {/* Text */}
-                <p className="font-jakarta text-sm text-nemo-dark-bg/80 dark:text-nemo-dark-text/90 leading-relaxed mt-3 mb-4 italic flex-1">
-                  "{t.text}"
-                </p>
-
-                {/* Author */}
-                <footer className="flex flex-col gap-3 pt-4 border-t border-nemo-dark-bg/8 dark:border-nemo-dark-border">
-                  <div className="flex items-center gap-3">
-                    {t.avatar ? (
-                      <img src={t.avatar} alt={`Photo de ${t.author}`} className="w-9 h-9 rounded-full object-cover shrink-0" loading="lazy" />
-                    ) : (
-                      <div className="w-9 h-9 rounded-full bg-nemo-orange/15 dark:bg-nemo-orange/20 text-nemo-orange flex items-center justify-center font-jakarta font-bold text-sm shrink-0" aria-hidden="true">
-                        {t.author.charAt(0)}
-                      </div>
-                    )}
-                    <div>
-                      <cite className="font-jakarta font-semibold text-sm text-nemo-dark-bg dark:text-nemo-dark-text not-italic">
-                        {t.author}
-                      </cite>
-                      {(t.company || t.role) && (
-                        <p className="font-jakarta text-xs text-nemo-dark-bg/50 dark:text-nemo-dark-muted">
-                          {[t.role, t.company].filter(Boolean).join(' — ')}
-                        </p>
-                      )}
-                    </div>
+                {testimonials.map(t => (
+                  <div
+                    key={t._id}
+                    style={{ width: `${cardW}px`, flexShrink: 0, minWidth: 0 }}
+                  >
+                    <TestimonialCard t={t} />
                   </div>
+                ))}
+              </div>
+            </div>
 
-                  {/* Date */}
-                  {formatReviewDate(t.reviewDate) && (
-                    <p className="font-jakarta text-xs text-nemo-dark-bg/35 dark:text-nemo-dark-muted/60 text-right">
-                      {formatReviewDate(t.reviewDate)}
-                    </p>
-                  )}
-                </footer>
-              </motion.blockquote>
-            ))}
-          </div>
+            {/* Controls: dots + arrows */}
+            {useSlider && (
+              <div className="flex items-center justify-center gap-4 mt-8">
+
+                {/* Left arrow — desktop only */}
+                {visibleCount > 1 && (
+                  <button
+                    onClick={prev}
+                    aria-label="Avis précédents"
+                    className="w-10 h-10 rounded-full border border-nemo-dark-bg/15 dark:border-nemo-dark-border text-nemo-dark-bg/50 dark:text-nemo-dark-muted hover:border-nemo-quote hover:text-nemo-quote flex items-center justify-center transition-all duration-200"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                )}
+
+                {/* Dots */}
+                <div className="flex items-center gap-2" role="tablist" aria-label="Navigation des avis">
+                  {Array.from({ length: dotsCount }).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goTo(i)}
+                      role="tab"
+                      aria-selected={i === current}
+                      aria-label={`Aller à l'avis ${i + 1}`}
+                      className={`rounded-full transition-all duration-300 ${
+                        i === current
+                          ? 'bg-nemo-quote w-6 h-2.5'
+                          : 'bg-nemo-dark-bg/20 dark:bg-nemo-dark-border w-2.5 h-2.5 hover:bg-nemo-quote/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Right arrow — desktop only */}
+                {visibleCount > 1 && (
+                  <button
+                    onClick={next}
+                    aria-label="Avis suivants"
+                    className="w-10 h-10 rounded-full border border-nemo-dark-bg/15 dark:border-nemo-dark-border text-nemo-dark-bg/50 dark:text-nemo-dark-muted hover:border-nemo-quote hover:text-nemo-quote flex items-center justify-center transition-all duration-200"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                )}
+              </div>
+            )}
+          </motion.div>
         )}
       </div>
     </section>
