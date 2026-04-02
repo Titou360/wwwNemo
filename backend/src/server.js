@@ -10,7 +10,7 @@ const app = express();
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'https://www-nemo.vercel.app'],
+  origin: ['http://localhost:3000', 'http://localhost:5173', 'https://www-nemo.vercel.app', 'https://nemosolutions.fr', 'https://www.nemosolutions.fr'],
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
