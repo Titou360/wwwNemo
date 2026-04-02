@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_BASE } from '../../lib/api';
 import { Facebook, Instagram, Linkedin, Globe, ExternalLink, X, Twitter } from 'lucide-react';
 
 interface ClientLink {
@@ -155,7 +156,7 @@ export default function References() {
   const [selected, setSelected] = useState<Client | null>(null);
 
   useEffect(() => {
-    fetch('/api/clients')
+    fetch(`${API_BASE}/api/clients`)
       .then(r => r.json())
       .then(data => setClients(Array.isArray(data) ? data : []))
       .catch(() => setClients([]))

@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, FileText, Users, Star, LogOut, Plus, Pencil, Trash2,
   Eye, EyeOff, AlertTriangle, X, Check, ExternalLink, Globe, Facebook,
-  Instagram, Linkedin, Twitter, Image, FileImage,
+  Instagram, Linkedin, Twitter, Image, FileImage, MapPin,
 } from 'lucide-react';
 import RichTextEditor from '../../components/ui/RichTextEditor';
 
@@ -56,12 +57,22 @@ interface Testimonial {
   order?: number;
 }
 
-type Section = 'articles' | 'clients' | 'testimonials' | 'media';
+interface City {
+  _id: string;
+  name: string;
+  slug: string;
+  dept: string;
+  context: string;
+  order: number;
+}
 
-const CONFIRM_PHRASES: Record<'articles' | 'clients' | 'testimonials', string> = {
+type Section = 'articles' | 'clients' | 'testimonials' | 'media' | 'cities';
+
+const CONFIRM_PHRASES: Record<'articles' | 'clients' | 'testimonials' | 'cities', string> = {
   articles:     "Je supprime l'article",
   clients:      'Je supprime le client',
   testimonials: "Je supprime l'avis",
+  cities:       'Je supprime la ville',
 };
 
 interface MediaFile {
@@ -171,7 +182,7 @@ function ArticleForm({
     Object.entries(form).forEach(([k, v]) => fd.append(k, String(v)));
     if (imageFile) fd.append('image', imageFile);
     try {
-      await fetch(id ? `/api/articles/${id}` : '/api/articles', {
+      await fetch(id ? `${API_BASE}/api/articles/${id}` : `${API_BASE}/api/articles`, {
         method: id ? 'PUT' : 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -295,7 +306,7 @@ function ClientForm({
     fd.append('links', JSON.stringify(links));
     if (logoFile) fd.append('logo', logoFile);
     try {
-      await fetch(id ? `/api/clients/${id}` : '/api/clients', {
+      await fetch(id ? `${API_BASE}/api/clients/${id}` : `${API_BASE}/api/clients`, {
         method: id ? 'PUT' : 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -440,7 +451,7 @@ function TestimonialForm({
     e.preventDefault();
     setSaving(true);
     try {
-      await fetch(id ? `/api/testimonials/${id}` : '/api/testimonials', {
+      await fetch(id ? `${API_BASE}/api/testimonials/${id}` : `${API_BASE}/api/testimonials`, {
         method: id ? 'PUT' : 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -558,7 +569,7 @@ function MediaLibrary({ token }: { token: string }) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetch('/api/media', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json());
+      const data = await fetch(`${API_BASE}/api/media`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json());
       setFiles(Array.isArray(data) ? data : []);
     } finally {
       setLoading(false);
@@ -569,7 +580,7 @@ function MediaLibrary({ token }: { token: string }) {
 
   const handleDelete = async () => {
     if (!deleteTarget || typed !== PHRASE) return;
-    await fetch(`/api/media/${encodeURIComponent(deleteTarget.filename)}`, {
+    await fetch(`${API_BASE}/api/media/${encodeURIComponent(deleteTarget.filename)}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -691,6 +702,79 @@ function MediaLibrary({ token }: { token: string }) {
   );
 }
 
+// ── City Form ──────────────────────────────────────────────────────────────────
+
+function CityForm({
+  city, token, onSave, onCancel,
+}: { city?: Partial<City>; token: string; onSave: () => void; onCancel: () => void }) {
+  const [form, setForm] = useState({
+    name:    city?.name    ?? '',
+    dept:    city?.dept    ?? '',
+    context: city?.context ?? '',
+    order:   city?.order   ?? 0,
+  });
+  const [saving, setSaving] = useState(false);
+  const id = city?._id;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: name === 'order' ? Number(value) : value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await fetch(id ? `${API_BASE}/api/cities/${id}` : `${API_BASE}/api/cities`, {
+        method: id ? 'PUT' : 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      onSave();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputCls = 'w-full px-4 py-2.5 rounded-xl bg-nemo-dark-bg border border-nemo-dark-border text-white font-jakarta text-sm focus:outline-none focus:border-nemo-orange focus:ring-2 focus:ring-nemo-orange/20 transition-all placeholder:text-nemo-bg/20';
+
+  return (
+    <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true">
+      <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="bg-nemo-dark-surface rounded-2xl p-8 max-w-lg w-full my-8 border border-nemo-dark-border">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-syne font-bold text-xl text-white">{id ? 'Modifier la ville' : 'Nouvelle ville'}</h2>
+          <button onClick={onCancel} aria-label="Fermer" className="text-nemo-bg/40 hover:text-white transition-colors"><X size={20} /></button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm text-nemo-bg/70 font-jakarta mb-1">Nom de la ville *</label>
+            <input name="name" required value={form.name} onChange={handleChange} className={inputCls} placeholder="ex : Belin-Béliet" />
+          </div>
+          <div>
+            <label className="block text-sm text-nemo-bg/70 font-jakarta mb-1">Département *</label>
+            <input name="dept" required value={form.dept} onChange={handleChange} className={inputCls} placeholder="ex : Gironde" />
+          </div>
+          <div>
+            <label className="block text-sm text-nemo-bg/70 font-jakarta mb-1">Contexte géographique *</label>
+            <input name="context" required value={form.context} onChange={handleChange} className={inputCls} placeholder="ex : au cœur du Val de l'Eyre, en Gironde" />
+            <p className="text-xs text-nemo-bg/40 font-jakarta mt-1">Apparaît dans "Votre partenaire digital {'{contexte}'}"</p>
+          </div>
+          <div>
+            <label className="block text-sm text-nemo-bg/70 font-jakarta mb-1">Ordre d'affichage</label>
+            <input name="order" type="number" value={form.order} onChange={handleChange} className={inputCls} placeholder="0" />
+          </div>
+          <div className="flex gap-3 justify-end pt-2">
+            <button type="button" onClick={onCancel} className="btn-secondary text-sm px-5 py-2">Annuler</button>
+            <button type="submit" disabled={saving} className="btn-primary text-sm px-5 py-2">
+              {saving ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Enregistrement...</> : <><Check size={14} />{id ? 'Mettre à jour' : 'Créer la ville'}</>}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  );
+}
+
 // ── Main Dashboard ─────────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
@@ -701,11 +785,13 @@ export default function AdminDashboard() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
   const [loading, setLoading] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string; type: 'articles' | 'clients' | 'testimonials' } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string; type: 'articles' | 'clients' | 'testimonials' | 'cities' } | null>(null);
   const [editArticle, setEditArticle] = useState<Article | null | 'new'>(null);
   const [editClient, setEditClient] = useState<Client | null | 'new'>(null);
   const [editTestimonial, setEditTestimonial] = useState<Testimonial | null | 'new'>(null);
+  const [editCity, setEditCity] = useState<City | null | 'new'>(null);
 
   const authHeader = { Authorization: `Bearer ${token}` };
 
@@ -713,14 +799,16 @@ export default function AdminDashboard() {
     if (!token) { navigate('/admin'); return; }
     setLoading(true);
     try {
-      const [a, c, t] = await Promise.all([
-        fetch('/api/articles/admin',      { headers: authHeader }).then(r => r.json()),
-        fetch('/api/clients/admin',       { headers: authHeader }).then(r => r.json()),
-        fetch('/api/testimonials/admin',  { headers: authHeader }).then(r => r.json()),
+      const [a, c, t, ci] = await Promise.all([
+        fetch(`${API_BASE}/api/articles/admin`,      { headers: authHeader }).then(r => r.json()),
+        fetch(`${API_BASE}/api/clients/admin`,       { headers: authHeader }).then(r => r.json()),
+        fetch(`${API_BASE}/api/testimonials/admin`,  { headers: authHeader }).then(r => r.json()),
+        fetch(`${API_BASE}/api/cities`).then(r => r.json()),
       ]);
       setArticles(Array.isArray(a) ? a : []);
       setClients(Array.isArray(c) ? c : []);
       setTestimonials(Array.isArray(t) ? t : []);
+      setCities(Array.isArray(ci) ? ci : []);
     } catch {
       navigate('/admin');
     } finally {
@@ -732,13 +820,13 @@ export default function AdminDashboard() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
-    await fetch(`/api/${deleteTarget.type}/${deleteTarget.id}`, { method: 'DELETE', headers: authHeader });
+    await fetch(`${API_BASE}/api/${deleteTarget.type}/${deleteTarget.id}`, { method: 'DELETE', headers: authHeader });
     setDeleteTarget(null);
     load();
   };
 
   const togglePublish = async (type: 'articles' | 'testimonials', id: string, current: boolean) => {
-    await fetch(`/api/${type}/${id}`, {
+    await fetch(`${API_BASE}/api/${type}/${id}`, {
       method: 'PUT',
       headers: { ...authHeader, 'Content-Type': 'application/json' },
       body: JSON.stringify({ published: !current }),
@@ -749,10 +837,11 @@ export default function AdminDashboard() {
   const logout = () => { localStorage.removeItem('nemo-admin-token'); navigate('/admin'); };
 
   const NAV_ITEMS: { key: Section; label: string; icon: React.ElementType; count?: number }[] = [
-    { key: 'articles',     label: 'Articles',    icon: FileText, count: articles.length },
-    { key: 'clients',      label: 'Clients',     icon: Users,    count: clients.length },
-    { key: 'testimonials', label: 'Avis',        icon: Star,     count: testimonials.length },
-    { key: 'media',        label: 'Médiathèque', icon: Image },
+    { key: 'articles',     label: 'Articles',      icon: FileText, count: articles.length },
+    { key: 'clients',      label: 'Clients',       icon: Users,    count: clients.length },
+    { key: 'testimonials', label: 'Avis',          icon: Star,     count: testimonials.length },
+    { key: 'cities',       label: 'Pages locales', icon: MapPin,   count: cities.length },
+    { key: 'media',        label: 'Médiathèque',   icon: Image },
   ];
 
   const tdCls = 'px-4 py-3 text-sm font-jakarta text-nemo-bg/80';
@@ -834,6 +923,11 @@ export default function AdminDashboard() {
           {section === 'testimonials' && (
             <button onClick={() => setEditTestimonial('new')} className="btn-primary text-sm px-4 py-2">
               <Plus size={14} aria-hidden="true" /> Nouvel avis
+            </button>
+          )}
+          {section === 'cities' && (
+            <button onClick={() => setEditCity('new')} className="btn-primary text-sm px-4 py-2">
+              <Plus size={14} aria-hidden="true" /> Nouvelle ville
             </button>
           )}
         </div>
@@ -1012,6 +1106,50 @@ export default function AdminDashboard() {
                   )}
                 </motion.div>
               )}
+              {/* ── CITIES ── */}
+              {section === 'cities' && (
+                <motion.div key="cities" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  {cities.length === 0 ? (
+                    <p className="text-center py-12 font-jakarta text-nemo-bg/50">Aucune ville. Cliquez sur "Nouvelle ville" pour commencer.</p>
+                  ) : (
+                    <table className="w-full">
+                      <thead className="border-b border-nemo-dark-border">
+                        <tr>
+                          <th className={thCls}>Ville</th>
+                          <th className={thCls}>Département</th>
+                          <th className={thCls}>Contexte géographique</th>
+                          <th className={thCls}>Ordre</th>
+                          <th className={thCls}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cities.map(city => (
+                          <tr key={city._id} className="border-b border-nemo-dark-border/50 hover:bg-white/2 transition-colors">
+                            <td className={tdCls}>
+                              <span className="font-semibold text-white">{city.name}</span>
+                              <span className="block text-xs text-nemo-bg/40 font-mono mt-0.5">/pages-locales/…/{city.slug}</span>
+                            </td>
+                            <td className={tdCls + ' text-nemo-bg/70'}>{city.dept}</td>
+                            <td className={tdCls + ' text-nemo-bg/60 text-xs max-w-xs truncate'}>{city.context}</td>
+                            <td className={tdCls + ' text-nemo-bg/60'}>{city.order}</td>
+                            <td className={tdCls}>
+                              <div className="flex items-center gap-2">
+                                <button onClick={() => setEditCity(city)} title="Modifier" className="w-8 h-8 rounded-lg bg-nemo-blue/10 text-nemo-blue hover:bg-nemo-blue hover:text-white flex items-center justify-center transition-all">
+                                  <Pencil size={13} />
+                                </button>
+                                <button onClick={() => setDeleteTarget({ id: city._id, label: city.name, type: 'cities' })} title="Supprimer" className="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all">
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </motion.div>
+              )}
+
               {/* ── MEDIA ── */}
               {section === 'media' && (
                 <motion.div key="media" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -1055,6 +1193,14 @@ export default function AdminDashboard() {
           token={token}
           onSave={() => { setEditTestimonial(null); load(); }}
           onCancel={() => setEditTestimonial(null)}
+        />
+      )}
+      {editCity && (
+        <CityForm
+          city={editCity === 'new' ? undefined : editCity}
+          token={token}
+          onSave={() => { setEditCity(null); load(); }}
+          onCancel={() => setEditCity(null)}
         />
       )}
     </div>

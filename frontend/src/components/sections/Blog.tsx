@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_BASE } from '../../lib/api';
 import { ChevronLeft, ChevronRight, X, Calendar, Clock, Tag, ArrowRight, ZoomIn } from 'lucide-react';
 
 interface Article {
@@ -304,7 +305,7 @@ export default function Blog() {
   const VISIBLE = 3;
 
   useEffect(() => {
-    fetch('/api/articles')
+    fetch(`${API_BASE}/api/articles`)
       .then(r => r.json())
       .then(data => setArticles(Array.isArray(data) ? data : []))
       .catch(() => setArticles([]))

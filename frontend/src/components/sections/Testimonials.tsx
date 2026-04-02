@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
+import { API_BASE } from '../../lib/api';
 import { Quote, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 type SourceKey = 'google' | 'linkedin' | 'facebook' | 'instagram' | 'malt' | 'fiverr';
@@ -175,7 +176,7 @@ export default function Testimonials() {
 
   // Fetch
   useEffect(() => {
-    fetch('/api/testimonials')
+    fetch(`${API_BASE}/api/testimonials`)
       .then(r => r.json())
       .then(data => setTestimonials(Array.isArray(data) ? data : []))
       .catch(() => setTestimonials([]))

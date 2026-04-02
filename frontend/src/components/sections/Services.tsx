@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
-  Globe, Wrench, Share2, Brain, TrendingUp, RefreshCw, MessageSquare, Palette,
+  Globe, Wrench, Share2, Brain, TrendingUp, RefreshCw, MessageSquare,
 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -50,12 +50,6 @@ const SERVICES = [
     title: 'Conseil & stratégie digitale',
     description: 'Accompagnement personnalisé pour définir et déployer votre stratégie numérique.',
     color: 'nemo-orange',
-  },
-  {
-    icon: Palette,
-    title: 'Identité visuelle',
-    description: 'Logo, charte graphique et supports de communication alignés avec votre image de marque.',
-    color: 'nemo-blue',
   },
 ];
 

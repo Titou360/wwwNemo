@@ -3,7 +3,6 @@ import { HelmetProvider } from 'react-helmet-async';
 import { useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import Header from './components/layout/Header';
-import Breadcrumb from './components/ui/Breadcrumb';
 import Footer from './components/layout/Footer';
 import CookieConsentInit from './components/ui/CookieConsent';
 import Home from './pages/Home';
@@ -12,6 +11,8 @@ import FAQ from './pages/FAQ';
 import PrendreRdv from './pages/PrendreRdv';
 import MentionsLegales from './pages/MentionsLegales';
 import PolitiqueConfidentialite from './pages/PolitiqueConfidentialite';
+import PagesLocales from './pages/PagesLocales';
+import PageLocaleDetail from './pages/PageLocaleDetail';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 
@@ -19,13 +20,11 @@ function ScrollToTop() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
     if (hash) {
-      // Légère attente pour que le DOM soit prêt
       const id = hash.slice(1);
       const el = document.getElementById(id);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
       } else {
-        // L'élément n'est pas encore dans le DOM (page venant de changer)
         setTimeout(() => {
           document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
         }, 80);
@@ -47,31 +46,6 @@ function PublicLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function PageLocale() {
-  const { pathname } = useLocation();
-  const city = pathname.split('/').pop()?.replace(/-/g, ' ') ?? '';
-  const cityCapitalized = city.charAt(0).toUpperCase() + city.slice(1);
-
-  return (
-    <PublicLayout>
-      <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
-        <div className="container-nemo max-w-3xl">
-          <Breadcrumb crumbs={[{ label: 'Pages locales', href: undefined }, { label: cityCapitalized }]} />
-          <div className="text-center">
-            <h1 className="font-syne font-extrabold text-4xl text-nemo-dark-bg dark:text-nemo-bg mb-6">
-              Agence web <span className="text-nemo-orange">{cityCapitalized}</span>
-            </h1>
-            <p className="font-jakarta text-nemo-dark-bg/60 dark:text-nemo-bg/60 text-lg leading-relaxed">
-              Nemo Solutions accompagne les entreprises de {cityCapitalized} dans leur développement digital.
-              Création de sites internet, SEO local, gestion des réseaux sociaux.
-            </p>
-          </div>
-        </div>
-      </main>
-    </PublicLayout>
-  );
-}
-
 export default function App() {
   return (
     <HelmetProvider>
@@ -86,7 +60,8 @@ export default function App() {
             <Route path="/prendre-rdv" element={<PublicLayout><PrendreRdv /></PublicLayout>} />
             <Route path="/mentions-legales" element={<PublicLayout><MentionsLegales /></PublicLayout>} />
             <Route path="/politique-de-confidentialite" element={<PublicLayout><PolitiqueConfidentialite /></PublicLayout>} />
-            <Route path="/pages-locales/:city" element={<PageLocale />} />
+            <Route path="/pages-locales" element={<PublicLayout><PagesLocales /></PublicLayout>} />
+            <Route path="/pages-locales/:service/:city" element={<PublicLayout><PageLocaleDetail /></PublicLayout>} />
             <Route path="/admin" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="*" element={

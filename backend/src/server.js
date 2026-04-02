@@ -26,6 +26,7 @@ app.use('/api/articles', require('./routes/articles'));
 app.use('/api/clients', require('./routes/clients'));
 app.use('/api/testimonials', require('./routes/testimonials'));
 app.use('/api/media', require('./routes/media'));
+app.use('/api/cities', require('./routes/cities'));
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
@@ -45,6 +46,25 @@ async function start() {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ MongoDB connecté');
 
+    // ── Seed villes si aucune en base ───────────────────────────────────────────
+    const City = require('./models/City');
+    const cityCount = await City.countDocuments();
+    if (cityCount === 0) {
+      const defaultCities = [
+        { name: 'Belin-Béliet',      slug: 'belin-beliet',      dept: 'Gironde',     context: "au cœur du Val de l'Eyre, en Gironde",     order: 1 },
+        { name: 'Salles',            slug: 'salles',             dept: 'Gironde',     context: 'dans les Landes de Gascogne, en Gironde',    order: 2 },
+        { name: 'Le Barp',           slug: 'le-barp',            dept: 'Gironde',     context: 'entre Bordeaux et Arcachon, en Gironde',     order: 3 },
+        { name: 'Mios',              slug: 'mios',               dept: 'Gironde',     context: 'dans les Landes de Gascogne, en Gironde',    order: 4 },
+        { name: 'Hostens',           slug: 'hostens',            dept: 'Gironde',     context: 'dans les Landes de Gascogne, en Gironde',    order: 5 },
+        { name: 'Cestas',            slug: 'cestas',             dept: 'Gironde',     context: 'entre Bordeaux et Arcachon, en Gironde',     order: 6 },
+        { name: 'Arcachon',          slug: 'arcachon',           dept: 'Gironde',     context: "sur le Bassin d'Arcachon, en Gironde",       order: 7 },
+        { name: 'Saugnacq-et-Muret', slug: 'saugnacq-et-muret', dept: 'Les Landes',  context: 'au Nord des Landes',                         order: 8 },
+      ];
+      await City.insertMany(defaultCities);
+      console.log('✅ Villes par défaut créées :', defaultCities.length);
+    }
+
+    // ── Admin ────────────────────────────────────────────────────────────────────
     const Admin = require('./models/Admin');
     const count = await Admin.countDocuments();
     console.log('📊 Admins en base:', count);
