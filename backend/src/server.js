@@ -27,6 +27,7 @@ app.use('/api/clients', require('./routes/clients'));
 app.use('/api/testimonials', require('./routes/testimonials'));
 app.use('/api/media', require('./routes/media'));
 app.use('/api/cities', require('./routes/cities'));
+app.use('/api/contact', require('./routes/contact'));
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));

@@ -25,12 +25,18 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('sending');
-    // TODO: integrate EmailJS
-    // emailjs.send('SERVICE_ID', 'TEMPLATE_ID', form, 'PUBLIC_KEY')
-    // Simulation
-    await new Promise(r => setTimeout(r, 1200));
-    setStatus('success');
-    setForm({ name: '', email: '', phone: '', subject: '', message: '' });
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error('Erreur serveur');
+      setStatus('success');
+      setForm({ name: '', email: '', phone: '', subject: '', message: '' });
+    } catch {
+      setStatus('error');
+    }
   };
 
   return (
