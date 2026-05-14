@@ -1,5 +1,6 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 const router = express.Router();
 
 const transporter = nodemailer.createTransport({
@@ -10,6 +11,10 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  lookup: (hostname, options, callback) => {
+    dns.lookup(hostname, { ...options, family: 4 }, callback);
+  },
+  tls: { rejectUnauthorized: false },
 });
 
 router.post('/', async (req, res) => {
