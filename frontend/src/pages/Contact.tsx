@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Send, Phone, Mail, MapPin, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import Breadcrumb from '../components/ui/Breadcrumb';
+import { API_BASE } from '../lib/api';
 
 const SUBJECTS = [
   'Création de site internet',
@@ -26,7 +27,7 @@ export default function Contact() {
     e.preventDefault();
     setStatus('sending');
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/contact`, {
+      const res = await fetch(`${API_BASE}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
