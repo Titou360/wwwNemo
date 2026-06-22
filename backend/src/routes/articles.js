@@ -1,17 +1,7 @@
 const router = require('express').Router();
-const multer = require('multer');
-const { cloudinary, makeStorage } = require('../cloudinary');
+const { upload, saveMedia, deleteMediaByUrl } = require('../upload');
 const Article = require('../models/Article');
 const auth = require('../middleware/auth');
-
-const upload = multer({
-  storage: makeStorage('nemo/articles'),
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true);
-    else cb(new Error('Seules les images sont acceptées'));
-  },
-});
 
 // GET /api/articles - public (published only)
 router.get('/', async (req, res) => {
@@ -50,7 +40,7 @@ router.get('/:slug', async (req, res) => {
 router.post('/', auth, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.image = req.file.path; // Cloudinary URL
+    if (req.file) data.image = await saveMedia(req.file, 'articles');
     const article = new Article(data);
     await article.save();
     res.status(201).json(article);
@@ -63,7 +53,7 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
 router.put('/:id', auth, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.image = req.file.path; // Cloudinary URL
+    if (req.file) data.image = await saveMedia(req.file, 'articles');
     const article = await Article.findByIdAndUpdate(req.params.id, data, { new: true, runValidators: true });
     if (!article) return res.status(404).json({ message: 'Article introuvable' });
     res.json(article);
@@ -77,11 +67,7 @@ router.delete('/:id', auth, async (req, res) => {
   try {
     const article = await Article.findByIdAndDelete(req.params.id);
     if (!article) return res.status(404).json({ message: 'Article introuvable' });
-    // Delete image from Cloudinary if present
-    if (article.image && article.image.includes('cloudinary')) {
-      const publicId = article.image.split('/').slice(-2).join('/').replace(/\.[^/.]+$/, '');
-      await cloudinary.uploader.destroy(publicId).catch(() => {});
-    }
+    await deleteMediaByUrl(article.image);
     res.json({ message: 'Article supprimé' });
   } catch (err) {
     res.status(500).json({ message: err.message });

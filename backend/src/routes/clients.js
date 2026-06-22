@@ -1,13 +1,7 @@
 const router = require('express').Router();
-const multer = require('multer');
-const { cloudinary, makeStorage } = require('../cloudinary');
+const { upload, saveMedia, deleteMediaByUrl } = require('../upload');
 const Client = require('../models/Client');
 const auth = require('../middleware/auth');
-
-const upload = multer({
-  storage: makeStorage('nemo/clients'),
-  limits: { fileSize: 2 * 1024 * 1024 },
-});
 
 // GET /api/clients - public
 router.get('/', async (req, res) => {
@@ -32,7 +26,7 @@ router.get('/admin', auth, async (req, res) => {
 router.post('/', auth, upload.single('logo'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.logo = req.file.path; // Cloudinary URL
+    if (req.file) data.logo = await saveMedia(req.file, 'clients');
     if (typeof data.links === 'string') data.links = JSON.parse(data.links);
     const client = new Client(data);
     await client.save();
@@ -45,7 +39,7 @@ router.post('/', auth, upload.single('logo'), async (req, res) => {
 router.put('/:id', auth, upload.single('logo'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.logo = req.file.path; // Cloudinary URL
+    if (req.file) data.logo = await saveMedia(req.file, 'clients');
     if (typeof data.links === 'string') data.links = JSON.parse(data.links);
     const client = await Client.findByIdAndUpdate(req.params.id, data, { new: true });
     if (!client) return res.status(404).json({ message: 'Client introuvable' });
@@ -58,11 +52,7 @@ router.put('/:id', auth, upload.single('logo'), async (req, res) => {
 router.delete('/:id', auth, async (req, res) => {
   try {
     const client = await Client.findByIdAndDelete(req.params.id);
-    // Delete image from Cloudinary if present
-    if (client?.logo && client.logo.includes('cloudinary')) {
-      const publicId = client.logo.split('/').slice(-2).join('/').replace(/\.[^/.]+$/, '');
-      await cloudinary.uploader.destroy(publicId).catch(() => {});
-    }
+    await deleteMediaByUrl(client?.logo);
     res.json({ message: 'Client supprimé' });
   } catch (err) {
     res.status(500).json({ message: err.message });
