@@ -27,6 +27,24 @@ export default function PageLocaleDetail() {
         <title>{pageTitle} — Nemo Solutions</title>
         <meta name="description" content={metaDesc} />
         <link rel="canonical" href={canonical} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'LocalBusiness',
+            name: 'Nemo Solutions',
+            url: canonical,
+            telephone: '+33621145888',
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: '29 Avenue des Pins',
+              addressLocality: 'Belin-Béliet',
+              postalCode: '33830',
+              addressCountry: 'FR',
+            },
+            areaServed: { '@type': 'City', name: city.name },
+            priceRange: '€€',
+          })}
+        </script>
       </Head>
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">

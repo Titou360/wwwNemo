@@ -12,7 +12,7 @@ const LD_JSON = {
   '@type': 'LocalBusiness',
   name: 'Nemo Solutions',
   description: 'Agence web spécialisée en création de sites internet, SEO et réseaux sociaux, basée à Belin-Béliet dans le Val de l\'Eyre, Nouvelle-Aquitaine.',
-  url: 'https://nemosolutions.fr',
+  url: 'https://www.nemosolutions.fr',
   telephone: '+33621145888',
   email: 'clement@nemosolutions.fr',
   address: {
