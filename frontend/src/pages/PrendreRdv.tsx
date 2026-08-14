@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Phone, Video } from 'lucide-react';
 import Breadcrumb from '../components/ui/Breadcrumb';
@@ -6,11 +6,11 @@ import Breadcrumb from '../components/ui/Breadcrumb';
 export default function PrendreRdv() {
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Prendre RDV — Nemo Solutions</title>
         <meta name="description" content="Réservez un créneau avec Clément FELICES de Nemo Solutions pour parler de votre projet digital. En visio, par téléphone ou en présentiel à Belin-Béliet." />
         <meta name="robots" content="index, follow" />
-      </Helmet>
+      </Head>
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
         <div className="container-nemo max-w-4xl">

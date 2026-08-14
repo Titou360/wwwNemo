@@ -1,15 +1,15 @@
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import { motion } from 'framer-motion';
 import Breadcrumb from '../components/ui/Breadcrumb';
 
 export default function MentionsLegales() {
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Mentions légales — Nemo Solutions</title>
         <meta name="description" content="Mentions légales de Nemo Solutions, entreprise individuelle de Clément FELICES, agence web basée à Belin-Béliet, Gironde." />
         <meta name="robots" content="noindex, follow" />
-      </Helmet>
+      </Head>
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
         <div className="container-nemo max-w-3xl">

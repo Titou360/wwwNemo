@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import Hero from '../components/sections/Hero';
 import Services from '../components/sections/Services';
 import DevisBanner from '../components/sections/DevisBanner';
@@ -46,7 +46,7 @@ const LD_JSON = {
 export default function Home() {
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Nemo Solutions — Agence web Val de l'Eyre & Nouvelle-Aquitaine</title>
         <meta
           name="description"
@@ -60,7 +60,7 @@ export default function Home() {
         <meta property="og:locale" content="fr_FR" />
         <link rel="canonical" href="https://nemosolutions.fr" />
         <script type="application/ld+json">{JSON.stringify(LD_JSON)}</script>
-      </Helmet>
+      </Head>
 
       <main id="main-content">
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 bg-nemo-orange text-white px-4 py-2 rounded-xl font-jakarta font-semibold text-sm">

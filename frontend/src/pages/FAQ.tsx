@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -119,11 +119,11 @@ export default function FAQ() {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>FAQ — Questions fréquentes — Nemo Solutions</title>
         <meta name="description" content="Toutes les réponses à vos questions sur la création de sites internet, le SEO, la maintenance et les tarifs de Nemo Solutions." />
         <meta name="robots" content="index, follow" />
-      </Helmet>
+      </Head>
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
         <div className="container-nemo max-w-3xl">

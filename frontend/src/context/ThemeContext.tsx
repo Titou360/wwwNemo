@@ -12,6 +12,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
+    // SSR / pré-rendu : pas d'accès à window/localStorage → thème par défaut.
+    if (typeof window === 'undefined') return 'light';
     const saved = localStorage.getItem('nemo-theme');
     if (saved === 'dark' || saved === 'light') return saved;
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import { motion } from 'framer-motion';
 import { Send, Phone, Mail, MapPin, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import Breadcrumb from '../components/ui/Breadcrumb';
@@ -42,11 +42,11 @@ export default function Contact() {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Contactez-nous — Nemo Solutions</title>
         <meta name="description" content="Contactez Nemo Solutions pour votre projet digital. Création de site internet, SEO, réseaux sociaux. Basé à Belin-Béliet, Val de l'Eyre. Réponse sous 24h." />
         <meta name="robots" content="index, follow" />
-      </Helmet>
+      </Head>
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
         <div className="container-nemo">

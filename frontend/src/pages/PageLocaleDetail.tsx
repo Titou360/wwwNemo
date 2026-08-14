@@ -1,5 +1,5 @@
 import { useParams, Link, Navigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import { motion } from 'framer-motion';
 import { MapPin, CheckCircle2, ChevronDown, Phone, Mail } from 'lucide-react';
 import { useState } from 'react';
@@ -23,11 +23,11 @@ export default function PageLocaleDetail() {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>{pageTitle} — Nemo Solutions</title>
         <meta name="description" content={metaDesc} />
         <link rel="canonical" href={canonical} />
-      </Helmet>
+      </Head>
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
         <div className="container-nemo max-w-4xl">

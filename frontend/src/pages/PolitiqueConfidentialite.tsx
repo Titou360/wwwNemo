@@ -1,15 +1,15 @@
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import { motion } from 'framer-motion';
 import Breadcrumb from '../components/ui/Breadcrumb';
 
 export default function PolitiqueConfidentialite() {
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Politique de confidentialité & RGPD — Nemo Solutions</title>
         <meta name="description" content="Politique de confidentialité et gestion des données personnelles de Nemo Solutions, conformément au RGPD." />
         <meta name="robots" content="noindex, follow" />
-      </Helmet>
+      </Head>
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
         <div className="container-nemo max-w-3xl">

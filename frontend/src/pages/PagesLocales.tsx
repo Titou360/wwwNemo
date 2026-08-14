@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, ArrowRight } from 'lucide-react';
@@ -10,14 +10,14 @@ export default function PagesLocales() {
 
   return (
     <>
-      <Helmet>
+      <Head>
         <title>Pages locales — Nemo Solutions | Agence web Val de l'Eyre</title>
         <meta
           name="description"
           content="Nemo Solutions intervient dans toute la Gironde : Belin-Béliet, Salles, Le Barp et alentours. Création de sites, SEO, réseaux sociaux, maintenance web."
         />
         <link rel="canonical" href="https://www.nemosolutions.fr/pages-locales" />
-      </Helmet>
+      </Head>
 
       <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
         <div className="container-nemo">
