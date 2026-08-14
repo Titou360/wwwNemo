@@ -2,42 +2,20 @@ import { useParams, Link, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { MapPin, CheckCircle2, ChevronDown, Phone, Mail } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Breadcrumb from '../components/ui/Breadcrumb';
-import { SERVICES_LOCAL, type City } from '../data/localPages';
-import { API_BASE } from '../lib/api';
+import { SERVICES_LOCAL } from '../data/localPages';
+import { CITIES } from '../data/cities';
 
 export default function PageLocaleDetail() {
   const { service: serviceSlug, city: citySlug } = useParams<{ service: string; city: string }>();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [city, setCity] = useState<City | null | 'not-found'>(null);
 
   const service = SERVICES_LOCAL.find((s) => s.slug === serviceSlug);
+  const city = CITIES.find((c) => c.slug === citySlug)
 
-  useEffect(() => {
-    fetch(`${API_BASE}/api/cities`)
-      .then(r => r.json())
-      .then((data: City[]) => {
-        const found = Array.isArray(data) ? data.find(c => c.slug === citySlug) : null;
-        setCity(found ?? 'not-found');
-      })
-      .catch(() => setCity('not-found'));
-  }, [citySlug]);
-
-  if (!service) return <Navigate to="/pages-locales" replace />;
-  if (city === null) {
-    // Chargement
-    return (
-      <main className="min-h-screen bg-nemo-bg dark:bg-nemo-dark-bg pt-28 pb-20">
-        <div className="container-nemo max-w-4xl space-y-6">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 rounded-2xl bg-nemo-dark-bg/5 dark:bg-nemo-dark-surface animate-pulse" />
-          ))}
-        </div>
-      </main>
-    );
-  }
-  if (city === 'not-found') return <Navigate to="/pages-locales" replace />;
+  if (!service) return <Navigate to="/pages-locales" replace />
+  if (!city) return <Navigate to="/pages-locales" replace />
 
   const pageTitle = `${service.title} à ${city.name}`;
   const metaDesc = `Nemo Solutions propose ses services de ${service.title.toLowerCase()} à ${city.name} (${city.dept}). ${service.tagline}. Devis gratuit et sans engagement.`;
@@ -239,16 +217,7 @@ export default function PageLocaleDetail() {
 }
 
 function CityCrossLinks({ serviceSlug, currentCitySlug, serviceTitle }: { serviceSlug: string; currentCitySlug: string; serviceTitle: string }) {
-  const [cities, setCities] = useState<City[]>([]);
-
-  useEffect(() => {
-    fetch(`${API_BASE}/api/cities`)
-      .then(r => r.json())
-      .then(data => setCities(Array.isArray(data) ? data : []))
-      .catch(() => {});
-  }, []);
-
-  const others = cities.filter(c => c.slug !== currentCitySlug);
+  const others = CITIES.filter(c => c.slug !== currentCitySlug);
   if (others.length === 0) return null;
 
   return (

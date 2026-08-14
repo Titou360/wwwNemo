@@ -2,20 +2,11 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, ArrowRight } from 'lucide-react';
-import { useState, useEffect } from 'react';
 import Breadcrumb from '../components/ui/Breadcrumb';
-import { SERVICES_LOCAL, type City } from '../data/localPages';
-import { API_BASE } from '../lib/api';
+import { SERVICES_LOCAL } from '../data/localPages';
+import { CITIES } from '../data/cities';
 
 export default function PagesLocales() {
-  const [cities, setCities] = useState<City[]>([]);
-
-  useEffect(() => {
-    fetch(`${API_BASE}/api/cities`)
-      .then(r => r.json())
-      .then(data => setCities(Array.isArray(data) ? data : []))
-      .catch(() => setCities([]));
-  }, []);
 
   return (
     <>
@@ -75,39 +66,31 @@ export default function PagesLocales() {
                 </div>
 
                 {/* Cards villes */}
-                {cities.length === 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="h-20 rounded-2xl bg-nemo-dark-bg/5 dark:bg-nemo-dark-surface animate-pulse" />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {cities.map((city) => (
-                      <Link
-                        key={city.slug}
-                        to={`/pages-locales/${service.slug}/${city.slug}`}
-                        className="card-nemo p-5 group flex items-center justify-between gap-3 hover:border-nemo-orange/40 transition-colors"
-                        aria-label={`${service.title} à ${city.name}`}
-                      >
-                        <div>
-                          <p className="font-syne font-semibold text-base text-nemo-dark-bg dark:text-nemo-bg group-hover:text-nemo-orange dark:group-hover:text-nemo-orange transition-colors">
-                            {service.title}
-                          </p>
-                          <p className="font-jakarta text-sm text-nemo-dark-bg/50 dark:text-nemo-dark-muted mt-0.5 flex items-center gap-1">
-                            <MapPin size={12} aria-hidden="true" />
-                            {city.name} — {city.dept}
-                          </p>
-                        </div>
-                        <ArrowRight
-                          size={18}
-                          className="text-nemo-dark-bg/20 dark:text-nemo-dark-muted group-hover:text-nemo-orange dark:group-hover:text-nemo-orange transition-colors shrink-0"
-                          aria-hidden="true"
-                        />
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {CITIES.map((city) => (
+                    <Link
+                      key={city.slug}
+                      to={`/pages-locales/${service.slug}/${city.slug}`}
+                      className="card-nemo p-5 group flex items-center justify-between gap-3 hover:border-nemo-orange/40 transition-colors"
+                      aria-label={`${service.title} à ${city.name}`}
+                    >
+                      <div>
+                        <p className="font-syne font-semibold text-base text-nemo-dark-bg dark:text-nemo-bg group-hover:text-nemo-orange dark:group-hover:text-nemo-orange transition-colors">
+                          {service.title}
+                        </p>
+                        <p className="font-jakarta text-sm text-nemo-dark-bg/50 dark:text-nemo-dark-muted mt-0.5 flex items-center gap-1">
+                          <MapPin size={12} aria-hidden="true" />
+                          {city.name} — {city.dept}
+                        </p>
+                      </div>
+                      <ArrowRight
+                        size={18}
+                        className="text-nemo-dark-bg/20 dark:text-nemo-dark-muted group-hover:text-nemo-orange dark:group-hover:text-nemo-orange transition-colors shrink-0"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  ))}
+                </div>
               </motion.section>
             ))}
           </div>
