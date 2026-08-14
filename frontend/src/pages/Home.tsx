@@ -58,7 +58,7 @@ export default function Home() {
         <meta property="og:description" content="Création de sites internet, SEO, réseaux sociaux. Basé à Belin-Béliet, on vous accompagne partout en Nouvelle-Aquitaine." />
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="fr_FR" />
-        <link rel="canonical" href="https://nemosolutions.fr" />
+        <link rel="canonical" href="https://www.nemosolutions.fr" />
         <script type="application/ld+json">{JSON.stringify(LD_JSON)}</script>
       </Head>
 

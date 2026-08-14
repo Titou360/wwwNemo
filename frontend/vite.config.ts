@@ -25,6 +25,7 @@ export default defineConfig({
   },
   // ssgOptions étendu par vite-react-ssg ; onFinished sera ajouté en Task 5.
   ssgOptions: {
+    dirStyle: 'nested',
     includedRoutes(paths: string[]) {
       return paths.filter((p) => !p.startsWith('/admin'))
     },

@@ -69,6 +69,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Le titre de page est géré par le composant Head de chaque page (vite-react-ssg / react-helmet). -->
+
+    <!-- Anti-FOUC : applique la classe dark AVANT le premier paint, miroir de ThemeContext (clé: nemo-theme) -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('nemo-theme');
+          if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          if (t === 'dark') document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
