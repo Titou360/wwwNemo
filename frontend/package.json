@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite-react-ssg build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -23,9 +23,10 @@
     "react-helmet-async": "^3.0.0",
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.6.0",
-    "react-router-dom": "^7.13.1",
+    "react-router-dom": "^6.30.4",
     "tailwindcss": "^4.2.1",
-    "vanilla-cookieconsent": "^3.1.0"
+    "vanilla-cookieconsent": "^3.1.0",
+    "vite-react-ssg": "^0.9.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
