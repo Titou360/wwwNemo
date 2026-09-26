@@ -37,9 +37,9 @@ const LD_JSON = {
   ],
   priceRange: '€€',
   sameAs: [
-    'https://facebook.com/nemosolutions',
-    'https://instagram.com/nemosolutions',
-    'https://linkedin.com/company/nemosolutions',
+    'https://www.facebook.com/NemoSolutions/',
+    'https://www.instagram.com/nemosolutions.fr/',
+    'https://www.linkedin.com/company/nemo-solutions-33/',
   ],
 };
 
