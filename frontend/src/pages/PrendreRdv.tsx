@@ -1,7 +1,45 @@
-import { Head } from 'vite-react-ssg';
+import { Head, ClientOnly } from 'vite-react-ssg';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, Phone, Video } from 'lucide-react';
+import { Calendar, Phone, Video, Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
+import Cal, { getCalApi } from '@calcom/embed-react';
 import Breadcrumb from '../components/ui/Breadcrumb';
+
+// Embed Cal.com — 100% client (getCalApi/window/iframe). Rendu uniquement via
+// <ClientOnly> pour ne pas casser le pré-rendu SSG.
+function CalEmbed() {
+  useEffect(() => {
+    (async function () {
+      const cal = await getCalApi({ namespace: '30min' });
+      cal('ui', {
+        cssVarsPerTheme: {
+          light: { 'cal-brand': '#fd6904' },
+          dark: { 'cal-brand': '#fcefdd' },
+        },
+        hideEventTypeDetails: false,
+        layout: 'month_view',
+      });
+    })();
+  }, []);
+
+  return (
+    <Cal
+      namespace="30min"
+      calLink="clemfelices/30min"
+      style={{ width: '100%', height: '100%', overflow: 'scroll' }}
+      config={{ layout: 'month_view', useSlotsViewOnSmallScreen: 'true', theme: 'auto' }}
+    />
+  );
+}
+
+function CalLoading() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full py-24 text-nemo-dark-bg/50 dark:text-nemo-bg/50">
+      <Loader2 size={28} className="animate-spin text-nemo-orange mb-3" aria-hidden="true" />
+      <p className="font-jakarta text-sm">Chargement du calendrier…</p>
+    </div>
+  );
+}
 
 export default function PrendreRdv() {
   return (
@@ -53,61 +91,38 @@ export default function PrendreRdv() {
             ))}
           </div>
 
-          {/* Calendar embed placeholder */}
+          {/* Cal.com embed */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.7 }}
             className="card-nemo overflow-hidden"
           >
-            {/* TODO: Replace with your actual Calendly / Cal.com / iCal widget URL */}
-            {/* Example: <iframe src="https://calendly.com/votre-lien" ... /> */}
-            <div className="bg-linear-to-br from-nemo-orange/5 to-nemo-blue/5 p-12 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-nemo-orange/10 flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-                <Calendar size={28} className="text-nemo-orange" />
-              </div>
-              <h2 className="font-syne font-bold text-xl text-nemo-dark-bg dark:text-nemo-bg mb-3">
-                Planning de réservation
-              </h2>
-              <p className="font-jakarta text-nemo-dark-bg/60 dark:text-nemo-bg/60 text-sm mb-6 max-w-md mx-auto">
-                Intégrez ici votre lien Calendly, Cal.com ou votre calendrier iCal pour que vos visiteurs puissent
-                choisir directement un créneau disponible.
-              </p>
-
-              {/* Temporary direct contact option */}
-              <div className="inline-flex flex-wrap gap-4 justify-center">
-                <a
-                  href="tel:+33621145888"
-                  className="btn-primary"
-                  aria-label="Appeler directement le 06 21 14 58 88"
-                >
-                  <Phone size={16} aria-hidden="true" />
-                  Appeler directement
-                </a>
-                <a
-                  href="mailto:clement@nemosolutions.fr?subject=Demande de rendez-vous"
-                  className="btn-secondary"
-                  aria-label="Envoyer un email pour prendre rendez-vous"
-                >
-                  Prendre RDV par email
-                </a>
-              </div>
-
-              {/* Instructions for integration */}
-              <div className="mt-8 p-4 rounded-xl bg-nemo-blue/5 border border-nemo-blue/10 text-left max-w-lg mx-auto">
-                <div className="flex items-start gap-2">
-                  <Clock size={14} className="text-nemo-blue mt-0.5 shrink-0" aria-hidden="true" />
-                  <p className="font-jakarta text-xs text-nemo-dark-bg/60 dark:text-nemo-bg/60">
-                    <strong className="text-nemo-blue">Pour intégrer votre planning :</strong>{' '}
-                    Remplacez ce bloc par votre iframe Calendly :{' '}
-                    <code className="bg-nemo-dark-bg/5 dark:bg-nemo-bg/5 px-1 rounded text-xs">
-                      {'<iframe src="https://calendly.com/votre-lien" />'}
-                    </code>
-                  </p>
-                </div>
-              </div>
+            <div className="min-h-[700px] w-full">
+              <ClientOnly fallback={<CalLoading />}>
+                {() => <CalEmbed />}
+              </ClientOnly>
             </div>
           </motion.div>
+
+          {/* Repli contact direct */}
+          <div className="mt-8 flex flex-wrap gap-4 justify-center">
+            <a
+              href="tel:+33621145888"
+              className="btn-secondary"
+              aria-label="Appeler directement le 06 21 14 58 88"
+            >
+              <Phone size={16} aria-hidden="true" />
+              Appeler directement
+            </a>
+            <a
+              href="mailto:clement@nemosolutions.fr?subject=Demande de rendez-vous"
+              className="btn-secondary"
+              aria-label="Envoyer un email pour prendre rendez-vous"
+            >
+              Prendre RDV par email
+            </a>
+          </div>
         </div>
       </main>
     </>
