@@ -26,7 +26,11 @@ router.post('/', async (req, res) => {
 
   try {
     await transporter.sendMail({
-      from: `"${name}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      // Expéditeur : SMTP_FROM (expéditeur vérifié Brevo). Repli sur SMTP_TO
+      // (adresse du domaine, valide) — jamais SMTP_USER seul, car l'identifiant
+      // de connexion Brevo (xxxxx@smtp-brevo.com) n'est PAS un expéditeur valide
+      // et provoque un soft bounce.
+      from: `"${name}" <${process.env.SMTP_FROM || process.env.SMTP_TO || process.env.SMTP_USER}>`,
       replyTo: email,
       to: process.env.SMTP_TO,
       subject: `[Nemo Contact] ${subject}`,
