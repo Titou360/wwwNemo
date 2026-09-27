@@ -98,7 +98,7 @@ export default function PrendreRdv() {
             transition={{ delay: 0.3, duration: 0.7 }}
             className="card-nemo overflow-hidden"
           >
-            <div className="min-h-[700px] w-full">
+            <div className="min-h-[700px] w-full p-4 sm:p-6">
               <ClientOnly fallback={<CalLoading />}>
                 {() => <CalEmbed />}
               </ClientOnly>
