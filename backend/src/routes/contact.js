@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
 
   try {
     await transporter.sendMail({
-      from: `"${name}" <${process.env.SMTP_USER}>`,
+      from: `"${name}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
       replyTo: email,
       to: process.env.SMTP_TO,
       subject: `[Nemo Contact] ${subject}`,

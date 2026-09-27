@@ -34,11 +34,17 @@ Dans Vercel → projet → **Settings → General** :
 | `JWT_EXPIRES_IN` | `7d` |
 | `ADMIN_EMAIL` | `clement@nemosolutions.fr` |
 | `ADMIN_PASSWORD` | (votre mot de passe admin) |
-| `SMTP_HOST` | `smtp.hostinger.com` |
-| `SMTP_PORT` | `465` |
-| `SMTP_USER` | `clement@nemosolutions.fr` |
-| `SMTP_PASS` | (votre mot de passe SMTP) |
-| `SMTP_TO` | `clement@nemosolutions.fr` |
+| `SMTP_HOST` | `smtp-relay.brevo.com` (Brevo) |
+| `SMTP_PORT` | `587` |
+| `SMTP_USER` | l'identifiant SMTP Brevo (`xxxxx@smtp-brevo.com`) |
+| `SMTP_PASS` | la **clé SMTP** Brevo (`xsmtpsib-…`) — *pas* la clé API |
+| `SMTP_FROM` | `clement@nemosolutions.fr` — **expéditeur vérifié dans Brevo** (≠ `SMTP_USER`) |
+| `SMTP_TO` | `clement@nemosolutions.fr` (destinataire des messages du formulaire) |
+
+> **Important (Brevo)** : `SMTP_FROM` doit être une adresse **expéditeur validée** dans Brevo
+> (Senders, Domains & IPs → Senders), sinon les envois sont rejetés. `SMTP_USER` est seulement
+> l'identifiant de connexion SMTP, jamais l'adresse d'expédition. Le code envoie donc
+> `from = SMTP_FROM` (repli sur `SMTP_USER` si non défini) et `replyTo` = l'email du visiteur.
 
 **À NE PAS mettre :**
 - `VITE_API_URL` → laisser **non défini** (le front appelle l'API en relatif `/api`, même domaine).
