@@ -26,10 +26,10 @@ const USEFUL_LINKS = [
 ];
 
 const SOCIAL_LINKS = [
-  { icon: Facebook,  href: 'https://facebook.com/nemosolutions',         label: 'Suivez-nous sur Facebook' },
-  { icon: Instagram, href: 'https://instagram.com/nemosolutions',        label: 'Suivez-nous sur Instagram' },
-  { icon: Linkedin,  href: 'https://linkedin.com/company/nemosolutions',  label: 'Suivez-nous sur LinkedIn' },
-  { icon: Globe,     href: 'https://google.com/search?q=nemosolutions',   label: 'Nemo Solutions sur Google' },
+  { icon: Facebook,  href: 'https://facebook.com/nemosolutions',              label: 'Suivez-nous sur Facebook' },
+  { icon: Instagram, href: 'https://instagram.com/nemosolutions.fr',          label: 'Suivez-nous sur Instagram' },
+  { icon: Linkedin,  href: 'https://www.linkedin.com/company/nemo-solutions-33', label: 'Suivez-nous sur LinkedIn' },
+  { icon: Globe,     href: 'https://g.page/r/CcBa3dG0WGIHEBM/review',      label: 'Nemo Solutions sur Google' },
 ];
 
 const VISIBLE = 5;
